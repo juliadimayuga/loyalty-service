@@ -82,9 +82,22 @@ app.post("/api/customers/:id/purchase", (req: Request, res: Response): void => {
     let customerPoints = Math.floor(purchaseAmount / 10);
     customer.lastPurchaseDate = new Date().toISOString();
 
+    /*
+    Preferred store purchases will receive a 1.25x bonus multiplier.
+    */
     if (customer.preferredStore === storeLocation){
-        customerPoints = Math.floor(customerPoints * 1.25)
+        customerPoints = Math.floor(customerPoints * 1.25);
     }
+
+    /*
+    The total multiplier respects the 3x maximum cap.
+    */
+    const maxCap = Math.floor((purchaseAmount / 10) * 3);
+    if (customerPoints > maxCap){
+        customerPoints = maxCap;
+    }
+
+    customer.points += customerPoints;
 
     if (customer.points >= 750) {
         customer.status = "GOLD";
