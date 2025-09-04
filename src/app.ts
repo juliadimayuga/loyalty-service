@@ -79,8 +79,12 @@ app.post("/api/customers/:id/purchase", (req: Request, res: Response): void => {
     const purchaseAmount: number = req.body.amount;
     const storeLocation: string = req.body.storeLocation;
 
-    customer.points += Math.floor(purchaseAmount / 10);
+    let customerPoints = Math.floor(purchaseAmount / 10);
     customer.lastPurchaseDate = new Date().toISOString();
+
+    if (customer.preferredStore === storeLocation){
+        customerPoints = Math.floor(customerPoints * 1.25)
+    }
 
     if (customer.points >= 750) {
         customer.status = "GOLD";
