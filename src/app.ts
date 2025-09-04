@@ -99,6 +99,11 @@ app.post("/api/customers/:id/purchase", (req: Request, res: Response): void => {
 
     customer.points += customerPoints;
 
+    /*
+    Tracks which store the purchase was made at.
+    */
+    (customer as any).currentPurchaseStore = storeLocation;
+
     if (customer.points >= 750) {
         customer.status = "GOLD";
         customer.lastStatusChange = new Date().toISOString();
