@@ -125,4 +125,40 @@ app.patch(
     }
 );
 
+/**
+ * Allow the customer service team to adjust customer points.
+ * @route POST /api/customers/:id/adjust
+ * @param req - Express request object
+ * @param res - Express response object
+ */
+app.post(
+    "/api/customers/:id/adjust", 
+    (req: Request, res: Response): void => {
+    const customerId: number = parseInt(req.params.id);
+        const customer: Customer | undefined = customers.find(
+            (c) => c.id === customerId
+        );
+        if (!customer) {
+            res.status(404).send("Customer not found");
+            return;
+        }
+
+        customer.points = Math.max(0, customer.points + req.body.amount);
+
+        if (customer.points >= 750){
+            customer.status = "GOLD";
+        }
+        else if (customer.points >= 500){
+            customer.status = "SILVER"
+        }
+        else{
+            customer.status = "BRONZE"
+        }
+
+        customer.lastStatusChange = new Date().toISOString();
+
+        res.json(customer);
+    }
+);
+
 export default app;
